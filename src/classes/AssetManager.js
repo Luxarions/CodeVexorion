@@ -220,6 +220,30 @@ class AssetManager extends EventEmitter {
     return img;
   }
 
+  createSvgElement(name, options = {}) {
+    const asset = this.#assets.get(name);
+    if (typeof document === 'undefined') return null;
+
+    const div = document.createElement('span');
+    div.className = options.className || 'inline-flex items-center justify-center';
+    if (options.id) div.id = options.id;
+
+    if (asset?.metadata?.svg) {
+      div.innerHTML = asset.metadata.svg;
+    } else {
+      // Return img tag pointing to svg file
+      const img = this.createImageElement(name, options);
+      if (img) div.appendChild(img);
+    }
+
+    return div;
+  }
+
+  getSvg(name) {
+    const asset = this.#assets.get(name);
+    return asset?.metadata?.svg || null;
+  }
+
   clearCache() {
     this.#loaded.clear();
     this.#loading.clear();
