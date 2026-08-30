@@ -1,0 +1,18 @@
+/**
+ * cv-chevron-up - Chevron atas
+ * Category: Navigation & Basic UI
+ * Icon #8
+ */
+export const id = 8;
+export const name = 'cv-chevron-up';
+export const label = 'Chevron atas';
+export const category = 'Navigation & Basic UI';
+export const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 15 L12 9 L18 15\"/></svg>";
+
+export default {
+  id,
+  name,
+  label,
+  category,
+  svg
+};

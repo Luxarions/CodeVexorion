@@ -1,0 +1,18 @@
+/**
+ * cv-folder - Folder
+ * Category: File & Document
+ * Icon #44
+ */
+export const id = 44;
+export const name = 'cv-folder';
+export const label = 'Folder';
+export const category = 'File & Document';
+export const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M3 7 A2 2 0 0 1 5 5 H9 L11 7 H19 A2 2 0 0 1 21 9 V19 A2 2 0 0 1 19 21 H5 A2 2 0 0 1 3 19 Z\"/></svg>";
+
+export default {
+  id,
+  name,
+  label,
+  category,
+  svg
+};

@@ -1,0 +1,18 @@
+/**
+ * cv-phone - Telepon
+ * Category: Notification & Communication
+ * Icon #37
+ */
+export const id = 37;
+export const name = 'cv-phone';
+export const label = 'Telepon';
+export const category = 'Notification & Communication';
+export const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M3 5 A2 2 0 0 1 5 3 H8 L10 8 L7.5 10 C9 13 11 15 14 16.5 L16 14 L21 16 V19 A2 2 0 0 1 19 21 C11 21 3 13 3 5 Z\"/></svg>";
+
+export default {
+  id,
+  name,
+  label,
+  category,
+  svg
+};

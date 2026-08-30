@@ -1,0 +1,18 @@
+/**
+ * cv-camera - Kamera
+ * Category: System & Tools
+ * Icon #58
+ */
+export const id = 58;
+export const name = 'cv-camera';
+export const label = 'Kamera';
+export const category = 'System & Tools';
+export const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M3 8 A2 2 0 0 1 5 6 H7 L9 4 H15 L17 6 H19 A2 2 0 0 1 21 8 V19 A2 2 0 0 1 19 21 H5 A2 2 0 0 1 3 19 Z\"/><circle cx=\"12\" cy=\"13\" r=\"4\"/></svg>";
+
+export default {
+  id,
+  name,
+  label,
+  category,
+  svg
+};

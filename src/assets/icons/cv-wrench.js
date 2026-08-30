@@ -1,0 +1,18 @@
+/**
+ * cv-wrench - Kunci pas
+ * Category: System & Tools
+ * Icon #52
+ */
+export const id = 52;
+export const name = 'cv-wrench';
+export const label = 'Kunci pas';
+export const category = 'System & Tools';
+export const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M14.7 6.3 A1 1 0 0 0 14 8 L4.5 17.5 A2.12 2.12 0 1 0 7.5 20.5 L17 11 A1 1 0 0 0 18.7 10.3 L21 8 L18 5 Z\"/></svg>";
+
+export default {
+  id,
+  name,
+  label,
+  category,
+  svg
+};

@@ -35,6 +35,10 @@ export { PluginSystem } from './plugins/PluginSystem.js';
 export { Middleware } from './plugins/Middleware.js';
 export { Hooks } from './plugins/Hooks.js';
 
+// ===== ASSETS & ICONS ECOSYSTEM =====
+export * as Icons from './assets/icons/index.js';
+export { ICONS_REGISTRY, loadIcon } from './assets/icons/index.js';
+
 // ===== DEFAULT EXPORT =====
 import * as Browser from './core/Browser.js';
 import * as Misc from './core/Misc.js';
@@ -42,6 +46,7 @@ import * as Dom from './core/Dom.js';
 import * as Classes from './classes/index.js';
 import * as Modes from './modes/index.js';
 import * as Plugins from './plugins/index.js';
+import * as IconsModule from './assets/icons/index.js';
 
 export default {
   Browser,
@@ -49,5 +54,6 @@ export default {
   Dom,
   Classes,
   Modes,
-  Plugins
+  Plugins,
+  Icons: IconsModule
 };

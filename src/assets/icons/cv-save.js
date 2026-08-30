@@ -1,0 +1,18 @@
+/**
+ * cv-save - Simpan
+ * Category: File & Document
+ * Icon #50
+ */
+export const id = 50;
+export const name = 'cv-save';
+export const label = 'Simpan';
+export const category = 'File & Document';
+export const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><path d=\"M3 3 H17 L21 7 V21 A2 2 0 0 1 19 23 H5 A2 2 0 0 1 3 21 V3 Z\"/><path d=\"M7 3 V9 H15 V3\"/><path d=\"M7 23 V17 H17 V23\"/></svg>";
+
+export default {
+  id,
+  name,
+  label,
+  category,
+  svg
+};

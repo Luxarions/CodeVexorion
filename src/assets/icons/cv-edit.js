@@ -1,0 +1,18 @@
+/**
+ * cv-edit - Edit/pencil
+ * Category: Navigation & Basic UI
+ * Icon #15
+ */
+export const id = 15;
+export const name = 'cv-edit';
+export const label = 'Edit/pencil';
+export const category = 'Navigation & Basic UI';
+export const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M3 21 H21\"/><path d=\"M5 17 L17 5 L19 7 L7 19 L3 21 Z\"/></svg>";
+
+export default {
+  id,
+  name,
+  label,
+  category,
+  svg
+};

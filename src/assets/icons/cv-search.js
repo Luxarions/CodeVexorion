@@ -1,0 +1,18 @@
+/**
+ * cv-search - Pencarian
+ * Category: Navigation & Basic UI
+ * Icon #3
+ */
+export const id = 3;
+export const name = 'cv-search';
+export const label = 'Pencarian';
+export const category = 'Navigation & Basic UI';
+export const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"6.5\"/><path d=\"M15.8 15.8 L20.5 20.5\"/></svg>";
+
+export default {
+  id,
+  name,
+  label,
+  category,
+  svg
+};

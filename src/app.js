@@ -43,7 +43,12 @@ import {
   // Plugins
   PluginSystem,
   Middleware,
-  Hooks
+  Hooks,
+
+  // Icons & Assets
+  Icons,
+  ICONS_REGISTRY,
+  loadIcon
 } from './index.js';
 
 class VexorionApp {
@@ -139,6 +144,18 @@ class VexorionApp {
           tags: ['user', 'profile', 'avatar']
         }
       }
+    });
+
+    // Register all 65 individual icons into the AssetManager
+    ICONS_REGISTRY.forEach(icon => {
+      this.assets.register(icon.name, `/src/assets/icons/${icon.name}.svg`, {
+        title: icon.label,
+        alt: `${icon.name} - ${icon.label}`,
+        type: 'image',
+        tags: ['icon', icon.category.toLowerCase().replace(/\s+/g, '-'), `id-${icon.id}`],
+        iconId: icon.id,
+        category: icon.category
+      });
     });
 
     // Setup Modes
@@ -1228,105 +1245,186 @@ class VexorionApp {
       ])
     ]);
 
+    // Interactive Filter & Search Bar
+    const filterCard = createElement('div', {
+      className: 'p-4 rounded-xl border flex flex-wrap items-center justify-between gap-4',
+      style: { backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }
+    });
+
+    let currentCategoryFilter = this._assetCategoryFilter || 'all';
+    let searchQuery = this._assetSearchQuery || '';
+
+    const categories = [
+      { id: 'all', label: 'All Assets & Icons' },
+      { id: 'Navigation & Basic UI', label: '🧭 Navigation (15)' },
+      { id: 'User & Profile', label: '👤 User (8)' },
+      { id: 'Commerce & Data', label: '📦 Commerce & Data (10)' },
+      { id: 'Notification & Communication', label: '🔔 Notification (10)' },
+      { id: 'File & Document', label: '📁 File & Docs (8)' },
+      { id: 'System & Tools', label: '⚙️ System & Tools (10)' },
+      { id: 'Media & Social', label: '🎨 Media & Social (5)' },
+      { id: 'images', label: '🖼️ Core Media Images' }
+    ];
+
+    const categoryChips = createElement('div', { className: 'flex flex-wrap gap-1.5' });
+    categories.forEach(cat => {
+      const isActive = currentCategoryFilter === cat.id;
+      const chip = createElement('button', {
+        className: `px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+          isActive
+            ? 'bg-indigo-600 text-white shadow-sm'
+            : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60'
+        }`,
+        onclick: () => {
+          this._assetCategoryFilter = cat.id;
+          this.renderAssetLab();
+        }
+      }, cat.label);
+      categoryChips.appendChild(chip);
+    });
+
+    const searchInput = createElement('input', {
+      id: 'asset-search-input',
+      type: 'text',
+      value: searchQuery,
+      placeholder: '🔍 Search 65 icons & media (e.g. home, search, user, cart, wifi)...',
+      className: 'w-full md:w-80 px-3 py-2 rounded-lg border text-xs outline-none focus:ring-2 focus:ring-indigo-500 font-mono',
+      style: { backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' },
+      oninput: (e) => {
+        this._assetSearchQuery = e.target.value.toLowerCase().trim();
+        this.renderAssetLab();
+      }
+    });
+
+    filterCard.appendChild(categoryChips);
+    filterCard.appendChild(searchInput);
+
     // Visual Asset Gallery Grid
+    const allAssets = this.assets.getAll();
+    const filteredAssets = allAssets.filter(asset => {
+      const isIcon = asset.tags.includes('icon');
+      const cat = asset.metadata?.category || (isIcon ? 'icons' : 'images');
+      
+      // Category filter
+      if (currentCategoryFilter !== 'all') {
+        if (currentCategoryFilter === 'images' && isIcon) return false;
+        if (currentCategoryFilter !== 'images' && cat !== currentCategoryFilter) return false;
+      }
+
+      // Search filter
+      if (searchQuery) {
+        const matchName = asset.name.toLowerCase().includes(searchQuery);
+        const matchTitle = (asset.title || '').toLowerCase().includes(searchQuery);
+        const matchAlt = (asset.alt || '').toLowerCase().includes(searchQuery);
+        const matchCat = (cat || '').toLowerCase().includes(searchQuery);
+        return matchName || matchTitle || matchAlt || matchCat;
+      }
+
+      return true;
+    });
+
     const galleryHeading = createElement('div', { className: 'flex items-center justify-between pt-2' }, [
       createElement('h3', { className: 'text-lg font-bold flex items-center gap-2' }, [
         createElement('span', {}, '🖼️'),
-        createElement('span', {}, 'Registered Assets Catalog')
+        createElement('span', {}, 'Registered Assets & 65-Icon Modular Catalog')
       ]),
-      createElement('span', { className: 'text-xs text-slate-400 font-mono' }, `${this.assets.count} Active Assets in Registry`)
+      createElement('span', { className: 'text-xs text-slate-400 font-mono' }, `Showing ${filteredAssets.length} of ${this.assets.count} Active Assets`)
     ]);
 
-    const galleryGrid = createElement('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-6' });
+    const galleryGrid = createElement('div', { className: 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4' });
 
-    const allAssets = this.assets.getAll();
-
-    allAssets.forEach(asset => {
+    filteredAssets.forEach(asset => {
       const key = asset.name;
       const isLoaded = this.assets.isLoaded(key);
       const fullUrl = asset.url;
+      const isIcon = asset.tags.includes('icon');
+      const iconId = asset.metadata?.iconId;
 
       const card = createElement('div', {
-        className: 'rounded-xl border overflow-hidden flex flex-col justify-between group transition-all hover:border-indigo-500/50 shadow-sm',
+        className: 'rounded-xl border overflow-hidden flex flex-col justify-between group transition-all hover:border-indigo-500/50 shadow-sm p-3 gap-3',
         style: { backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }
       });
 
-      // Image Container with fallback handling
-      const imgWrapper = createElement('div', {
-        className: 'relative w-full h-48 bg-slate-950 overflow-hidden flex items-center justify-center'
+      // Preview Wrapper
+      const previewWrapper = createElement('div', {
+        className: `relative w-full ${isIcon ? 'h-24' : 'h-36'} bg-slate-950/80 rounded-lg overflow-hidden flex items-center justify-center border border-slate-800/80 p-3`
       });
 
       const img = createElement('img', {
         src: fullUrl,
         alt: asset.alt || key,
-        className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300',
+        className: isIcon
+          ? 'w-10 h-10 object-contain filter invert opacity-90 group-hover:scale-110 transition-transform duration-200'
+          : 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300',
         loading: 'lazy'
       });
       img.referrerPolicy = 'no-referrer';
 
       const tagBadge = createElement('div', {
-        className: 'absolute top-3 left-3 px-2 py-1 rounded bg-black/70 backdrop-blur-md text-[10px] font-mono text-indigo-300 border border-indigo-500/30'
-      }, key);
+        className: 'absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-md text-[9px] font-mono text-indigo-300 border border-indigo-500/30'
+      }, isIcon ? `#${iconId}` : 'IMG');
 
       const cacheBadge = createElement('div', {
-        className: `absolute top-3 right-3 px-2 py-1 rounded backdrop-blur-md text-[10px] font-mono border ${
+        className: `absolute top-2 right-2 px-1.5 py-0.5 rounded backdrop-blur-md text-[9px] font-mono border ${
           isLoaded
-            ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
-            : 'bg-slate-900/80 text-slate-400 border-slate-700/40'
+            ? 'bg-emerald-950/90 text-emerald-400 border-emerald-500/40'
+            : 'bg-slate-900/90 text-slate-400 border-slate-700/40'
         }`
-      }, isLoaded ? '● Cached (Memory)' : '○ Standby');
+      }, isLoaded ? '● Loaded' : '○ Standby');
 
-      imgWrapper.appendChild(img);
-      imgWrapper.appendChild(tagBadge);
-      imgWrapper.appendChild(cacheBadge);
+      previewWrapper.appendChild(img);
+      previewWrapper.appendChild(tagBadge);
+      previewWrapper.appendChild(cacheBadge);
 
       // Metadata Info
-      const body = createElement('div', { className: 'p-4 space-y-3 flex-1 flex flex-col justify-between' }, [
-        createElement('div', { className: 'space-y-1.5' }, [
-          createElement('h4', { className: 'font-bold text-sm text-slate-100 group-hover:text-indigo-400 transition-colors' }, asset.title || key),
-          createElement('p', { className: 'text-xs text-slate-400 line-clamp-2' }, asset.alt || 'Visual system asset'),
-          createElement('div', { className: 'flex flex-wrap gap-1 pt-1' },
-            (asset.tags || []).map(t =>
-              createElement('span', {
-                className: 'px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-300 border border-slate-700'
-              }, `#${t}`)
-            )
-          )
+      const body = createElement('div', { className: 'space-y-1.5 flex-1 flex flex-col justify-between' }, [
+        createElement('div', { className: 'space-y-1' }, [
+          createElement('h4', { className: 'font-bold text-xs text-slate-100 group-hover:text-indigo-400 transition-colors truncate' }, asset.title || key),
+          createElement('p', { className: 'text-[11px] font-mono text-indigo-300/80 truncate' }, key),
+          createElement('p', { className: 'text-[10px] text-slate-400 line-clamp-1' }, asset.metadata?.category || 'Visual Asset')
         ]),
-        createElement('div', { className: 'space-y-2 pt-2 border-t', style: { borderColor: 'var(--border-color)' } }, [
-          createElement('div', { className: 'text-[11px] font-mono text-slate-400 truncate', title: fullUrl }, fullUrl),
-          createElement('div', { className: 'flex items-center justify-between gap-2' }, [
-            createElement('button', {
-              className: 'flex-1 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-all text-center',
-              onclick: async () => {
-                try {
-                  await this.assets.load(key);
-                  this.logger.info(`[AssetManager] Loaded "${key}" directly`);
-                  this.renderAssetLab();
-                } catch (e) {
-                  this.logger.error(`[AssetManager] Failed to load "${key}": ${e.message}`);
-                }
+        createElement('div', { className: 'pt-2 border-t flex items-center justify-between gap-1.5', style: { borderColor: 'var(--border-color)' } }, [
+          createElement('button', {
+            className: 'flex-1 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-medium transition-all text-center',
+            onclick: async () => {
+              try {
+                await this.assets.load(key);
+                this.logger.info(`[AssetManager] Loaded "${key}"`);
+                this.renderAssetLab();
+              } catch (e) {
+                this.logger.error(`[AssetManager] Failed to load "${key}": ${e.message}`);
               }
-            }, isLoaded ? '✓ Cached' : '⚡ Load'),
-            createElement('button', {
-              className: 'px-3 py-1.5 rounded border border-slate-700 hover:bg-slate-800 text-xs font-mono text-indigo-400 transition-all',
-              title: 'Copy Asset Key',
-              onclick: (e) => {
-                if (navigator.clipboard) {
-                  navigator.clipboard.writeText(key);
-                  e.target.textContent = 'Copied!';
-                  setTimeout(() => { e.target.textContent = 'Copy'; }, 1500);
-                }
+            }
+          }, isLoaded ? '✓ In Memory' : '⚡ Load'),
+          createElement('button', {
+            className: 'px-2 py-1 rounded border border-slate-700 hover:bg-slate-800 text-[11px] font-mono text-indigo-400 transition-all',
+            title: 'Copy import statement / key',
+            onclick: (e) => {
+              const snippet = isIcon
+                ? `import { ${key.replace(/-/g, '_')} } from 'vexorion/icons/${key}.js';`
+                : `assets.get('${key}')`;
+              if (navigator.clipboard) {
+                navigator.clipboard.writeText(snippet);
+                e.target.textContent = 'Copied!';
+                setTimeout(() => { e.target.textContent = 'Copy'; }, 1500);
               }
-            }, 'Copy')
-          ])
+            }
+          }, 'Copy')
         ])
       ]);
 
-      card.appendChild(imgWrapper);
+      card.appendChild(previewWrapper);
       card.appendChild(body);
       galleryGrid.appendChild(card);
     });
+
+    if (filteredAssets.length === 0) {
+      const emptyState = createElement('div', {
+        className: 'col-span-full py-12 text-center text-slate-400 font-mono text-xs border border-dashed rounded-xl',
+        style: { borderColor: 'var(--border-color)' }
+      }, `No assets or icons found matching category "${currentCategoryFilter}" and query "${searchQuery}".`);
+      galleryGrid.appendChild(emptyState);
+    }
 
     // Integration Code Card
     const codeSnippet = `// 1. Initialize AssetManager in your Vexorion application
