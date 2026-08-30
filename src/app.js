@@ -31,6 +31,7 @@ import {
   Validator,
   Router,
   Store,
+  AssetManager,
 
   // Modes
   DarkMode,
@@ -111,6 +112,33 @@ class VexorionApp {
       email: 'required|email',
       age: 'required|integer|min:18|max:120',
       role: 'required|enum:developer,designer,manager,architect'
+    });
+
+    // Setup AssetManager with visual assets
+    this.assets = new AssetManager({
+      assets: {
+        'logo': {
+          url: '/src/assets/images/vexorion_logo_1788081398062.jpg',
+          alt: 'Vexorion Official Framework Logo',
+          title: 'Vexorion Logo',
+          type: 'image',
+          tags: ['branding', 'logo', 'identity']
+        },
+        'hero_banner': {
+          url: '/src/assets/images/vexorion_hero_banner_1788081416448.jpg',
+          alt: 'Vexorion Architecture and Runtime Ecosystem',
+          title: 'Architecture Visualization',
+          type: 'image',
+          tags: ['hero', 'banner', 'architecture']
+        },
+        'architect_avatar': {
+          url: '/src/assets/images/developer_avatar_1788081430918.jpg',
+          alt: 'Vexorion Core Architect Portrait',
+          title: 'Lead Architect Avatar',
+          type: 'image',
+          tags: ['user', 'profile', 'avatar']
+        }
+      }
     });
 
     // Setup Modes
@@ -225,6 +253,7 @@ class VexorionApp {
       .addRoute('/todos', () => this.renderTodos())
       .addRoute('/state', () => this.renderStateLab())
       .addRoute('/cache', () => this.renderCacheLab())
+      .addRoute('/assets', () => this.renderAssetLab())
       .addRoute('/browser', () => this.renderBrowserLab())
       .addRoute('/stream', () => this.renderStreamLab())
       .addRoute('/validator', () => this.renderValidatorLab())
@@ -281,13 +310,18 @@ class VexorionApp {
     });
 
     // Logo & Brand
+    const logoImg = createElement('img', {
+      src: this.assets.getUrl('logo') || '/src/assets/images/vexorion_logo_1788081398062.jpg',
+      alt: 'Vexorion Framework Official Logo',
+      className: 'w-9 h-9 rounded-lg object-cover shadow-md border border-indigo-500/30'
+    });
+    logoImg.referrerPolicy = 'no-referrer';
+
     const brand = createElement('div', {
-      className: 'flex items-center space-x-3 cursor-pointer',
+      className: 'flex items-center space-x-3 cursor-pointer select-none',
       onclick: () => this.router.navigate('/')
     }, [
-      createElement('div', {
-        className: 'w-9 h-9 rounded-lg bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-black text-white text-lg shadow-md'
-      }, 'V'),
+      logoImg,
       createElement('div', {}, [
         createElement('div', { className: 'font-bold tracking-tight text-base flex items-center gap-2' }, [
           createElement('span', {}, 'VEXORION'),
@@ -301,7 +335,7 @@ class VexorionApp {
 
     // Navigation Links
     const nav = createElement('nav', {
-      className: 'hidden md:flex items-center space-x-1 font-medium text-sm'
+      className: 'hidden lg:flex items-center space-x-1 font-medium text-sm'
     });
 
     const routes = [
@@ -309,6 +343,7 @@ class VexorionApp {
       { path: '/todos', label: 'Todo & Binding', icon: '📝' },
       { path: '/state', label: 'StateManager', icon: '🔄' },
       { path: '/cache', label: 'Cache System', icon: '💾' },
+      { path: '/assets', label: 'Media & Assets', icon: '🖼️' },
       { path: '/browser', label: 'Browser Info', icon: '🌐' },
       { path: '/stream', label: 'Stream & Ops', icon: '🌊' },
       { path: '/validator', label: 'Validator', icon: '🛡️' },
@@ -327,6 +362,9 @@ class VexorionApp {
       ]);
       nav.appendChild(link);
     });
+
+    // Right Controls: Mode Switcher & Profile Avatar
+    const rightControls = createElement('div', { className: 'flex items-center gap-3' });
 
     // Theme Mode Switcher
     const modeSwitcher = createElement('div', {
@@ -359,9 +397,22 @@ class VexorionApp {
       modeSwitcher.appendChild(btn);
     });
 
+    // Profile Avatar Button
+    const avatarImg = createElement('img', {
+      src: this.assets.getUrl('architect_avatar') || '/src/assets/images/developer_avatar_1788081430918.jpg',
+      alt: 'Architect Profile Avatar',
+      className: 'w-8 h-8 rounded-full object-cover border-2 border-indigo-500/40 shadow-sm hover:scale-105 transition-transform cursor-pointer',
+      title: 'Architect Profile (State & Media)',
+      onclick: () => this.router.navigate('/assets')
+    });
+    avatarImg.referrerPolicy = 'no-referrer';
+
+    rightControls.appendChild(modeSwitcher);
+    rightControls.appendChild(avatarImg);
+
     header.appendChild(brand);
     header.appendChild(nav);
-    header.appendChild(modeSwitcher);
+    header.appendChild(rightControls);
 
     // Mobile nav bar
     const mobileNav = createElement('div', {
@@ -434,22 +485,30 @@ class VexorionApp {
 
     const container = createElement('div', { className: 'space-y-8 animate-fade-in' });
 
-    // Hero Banner
+    // Hero Banner with Visual Asset
+    const heroBgImg = createElement('img', {
+      src: this.assets.getUrl('hero_banner') || '/src/assets/images/vexorion_hero_banner_1788081416448.jpg',
+      alt: 'Vexorion Core Architecture Ecosystem Banner',
+      className: 'absolute inset-0 w-full h-full object-cover opacity-20 filter blur-[1px]'
+    });
+    heroBgImg.referrerPolicy = 'no-referrer';
+
     const hero = createElement('div', {
-      className: 'rounded-2xl p-6 md:p-10 border relative overflow-hidden',
+      className: 'rounded-2xl p-6 md:p-10 border relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8',
       style: {
         backgroundColor: 'var(--bg-secondary)',
         borderColor: 'var(--border-color)'
       }
     }, [
-      createElement('div', { className: 'max-w-3xl space-y-4 relative z-10' }, [
+      heroBgImg,
+      createElement('div', { className: 'max-w-2xl space-y-4 relative z-10' }, [
         createElement('div', { className: 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' }, [
           createElement('span', { className: 'w-2 h-2 rounded-full bg-indigo-400' }),
           createElement('span', {}, 'Autonomous JavaScript Architecture')
         ]),
         createElement('h1', { className: 'text-3xl md:text-5xl font-black tracking-tight' }, 'The Vexorion Ecosystem'),
         createElement('p', { className: 'text-base md:text-lg leading-relaxed', style: { color: 'var(--text-secondary)' } },
-          'A handcrafted, modular JavaScript engine providing core hardware & engine detection, reactive event emitters, bidirectional bindings, state history tracking, high-efficiency caching, and multi-mode theme systems.'
+          'A handcrafted, modular JavaScript engine providing core hardware & engine detection, reactive event emitters, bidirectional bindings, state history tracking, high-efficiency caching, asset pipelines, and multi-mode theme systems.'
         ),
         createElement('div', { className: 'flex flex-wrap gap-3 pt-2' }, [
           createElement('button', {
@@ -459,8 +518,28 @@ class VexorionApp {
           createElement('button', {
             className: 'px-5 py-2.5 rounded-lg border font-medium text-sm transition-all hover:bg-slate-800/50 flex items-center gap-2',
             style: { borderColor: 'var(--border-color)' },
+            onclick: () => this.router.navigate('/assets')
+          }, '🖼️ Explore Media & Assets'),
+          createElement('button', {
+            className: 'px-5 py-2.5 rounded-lg border font-medium text-sm transition-all hover:bg-slate-800/50 flex items-center gap-2',
+            style: { borderColor: 'var(--border-color)' },
             onclick: () => this.router.navigate('/quickstart')
-          }, '📖 View Quick Start & Sandbox')
+          }, '📖 Quick Start & Sandbox')
+        ])
+      ]),
+      createElement('div', { className: 'relative z-10 w-full md:w-80 rounded-xl overflow-hidden border shadow-xl border-indigo-500/30 group' }, [
+        createElement('img', {
+          src: this.assets.getUrl('hero_banner') || '/src/assets/images/vexorion_hero_banner_1788081416448.jpg',
+          alt: 'Vexorion Visual Architecture Architecture Preview',
+          className: 'w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300',
+          loading: 'eager'
+        }),
+        createElement('div', {
+          className: 'p-3 text-xs flex items-center justify-between border-t',
+          style: { backgroundColor: 'var(--bg-tertiary)', borderColor: 'var(--border-color)' }
+        }, [
+          createElement('span', { className: 'font-mono text-indigo-400 font-semibold' }, 'Architecture Visualizer'),
+          createElement('span', { className: 'text-emerald-400 font-mono text-[11px]' }, '● Live Ecosystem')
         ])
       ])
     ]);
@@ -489,6 +568,13 @@ class VexorionApp {
         icon: '💾',
         badge: 'CacheManager.js',
         action: () => this.router.navigate('/cache')
+      },
+      {
+        title: 'Asset & Media Manager',
+        desc: 'Preloading pipeline, memory image cache, resolution detection, metadata registry, and direct rendering.',
+        icon: '🖼️',
+        badge: 'AssetManager.js',
+        action: () => this.router.navigate('/assets')
       },
       {
         title: 'Bidirectional Binding',
@@ -1013,6 +1099,279 @@ class VexorionApp {
     container.appendChild(statsBar);
     container.appendChild(formCard);
     container.appendChild(tableCard);
+    main.appendChild(container);
+  }
+
+  // ==========================================
+  // PAGE: ASSET & MEDIA MANAGER LAB
+  // ==========================================
+  renderAssetLab() {
+    const main = querySelector('#main-view');
+    if (!main) return;
+    main.innerHTML = '';
+
+    const container = createElement('div', { className: 'space-y-6 max-w-6xl mx-auto animate-fade-in' });
+
+    // Header
+    const header = createElement('div', { className: 'space-y-2' }, [
+      createElement('h2', { className: 'text-2xl md:text-3xl font-bold' }, '🖼️ AssetManager & Media Pipeline Lab'),
+      createElement('p', { className: 'text-sm', style: { color: 'var(--text-secondary)' } },
+        'Reactive media registry, automatic image preloading, resolution inspection, DOM element generators, and zero-latency in-memory cache.'
+      )
+    ]);
+
+    // Live Metrics Bar
+    const statsBar = createElement('div', { className: 'grid grid-cols-2 sm:grid-cols-4 gap-4' }, [
+      this.createStatBox('Total Registered', this.assets.count, '📦'),
+      this.createStatBox('Cached In Memory', this.assets.cache.size, '⚡'),
+      this.createStatBox('Media Types', 'Images, Vectors', '🎨'),
+      this.createStatBox('Pipeline State', 'Active & Ready', '🚀')
+    ]);
+
+    // Preload & Actions Card
+    const actionsCard = createElement('div', {
+      className: 'p-5 rounded-xl border flex flex-wrap items-center justify-between gap-4',
+      style: { backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }
+    });
+
+    const actionButtons = createElement('div', { className: 'flex flex-wrap items-center gap-3' });
+
+    const preloadBtn = createElement('button', {
+      id: 'preload-all-btn',
+      className: 'px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition-all shadow-md',
+      onclick: async () => {
+        const btn = querySelector('#preload-all-btn');
+        if (btn) btn.textContent = '⏳ Preloading Assets...';
+        try {
+          const results = await this.assets.preloadAll();
+          this.logger.info(`[AssetManager] Successfully preloaded ${results.length} assets`);
+          this.renderAssetLab();
+        } catch (err) {
+          this.logger.error(`[AssetManager] Preload error: ${err.message}`);
+        }
+      }
+    }, '⚡ Preload All Assets to Memory');
+
+    const clearCacheBtn = createElement('button', {
+      className: 'px-4 py-2.5 rounded-lg border text-rose-400 border-rose-500/30 hover:bg-rose-500/10 font-medium text-xs transition-all',
+      onclick: () => {
+        this.assets.clearCache();
+        this.logger.warn('[AssetManager] Cleared asset memory cache');
+        this.renderAssetLab();
+      }
+    }, '🧹 Clear Asset Cache');
+
+    actionButtons.appendChild(preloadBtn);
+    actionButtons.appendChild(clearCacheBtn);
+
+    const assetEngineInfo = createElement('div', {
+      className: 'text-xs font-mono text-slate-400 flex items-center gap-2'
+    }, [
+      createElement('span', { className: 'w-2 h-2 rounded-full bg-emerald-400' }),
+      createElement('span', {}, 'Engine: classes/AssetManager.js')
+    ]);
+
+    actionsCard.appendChild(actionButtons);
+    actionsCard.appendChild(assetEngineInfo);
+
+    // Interactive Register Asset Form
+    const registerCard = createElement('div', {
+      className: 'p-5 rounded-xl border space-y-4',
+      style: { backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }
+    }, [
+      createElement('div', { className: 'flex items-center justify-between' }, [
+        createElement('h3', { className: 'text-base font-bold' }, 'Register New Asset to Pipeline:'),
+        createElement('span', { className: 'text-xs font-mono text-indigo-400' }, 'assets.register(key, options)')
+      ]),
+      createElement('div', { className: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3' }, [
+        createElement('input', {
+          id: 'new-asset-key',
+          type: 'text',
+          placeholder: 'Asset Key (e.g. hero_mockup)',
+          className: 'px-3 py-2 rounded-lg border text-xs outline-none focus:ring-2 focus:ring-indigo-500 font-mono',
+          style: { backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }
+        }),
+        createElement('input', {
+          id: 'new-asset-url',
+          type: 'text',
+          placeholder: 'URL or Path (/src/assets/...)',
+          className: 'px-3 py-2 rounded-lg border text-xs outline-none focus:ring-2 focus:ring-indigo-500 font-mono',
+          style: { backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }
+        }),
+        createElement('input', {
+          id: 'new-asset-title',
+          type: 'text',
+          placeholder: 'Title / Alt Description',
+          className: 'px-3 py-2 rounded-lg border text-xs outline-none focus:ring-2 focus:ring-indigo-500 font-mono',
+          style: { backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }
+        }),
+        createElement('button', {
+          className: 'px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-all shadow-sm flex items-center justify-center gap-2',
+          onclick: () => {
+            const key = querySelector('#new-asset-key')?.value.trim();
+            const url = querySelector('#new-asset-url')?.value.trim();
+            const title = querySelector('#new-asset-title')?.value.trim() || key;
+
+            if (key && url) {
+              this.assets.register(key, {
+                url,
+                alt: title,
+                title,
+                type: 'image',
+                tags: ['custom', 'user-registered']
+              });
+              this.logger.info(`[AssetManager] Registered new asset "${key}" -> ${url}`);
+              this.renderAssetLab();
+            }
+          }
+        }, '➕ Register Asset')
+      ])
+    ]);
+
+    // Visual Asset Gallery Grid
+    const galleryHeading = createElement('div', { className: 'flex items-center justify-between pt-2' }, [
+      createElement('h3', { className: 'text-lg font-bold flex items-center gap-2' }, [
+        createElement('span', {}, '🖼️'),
+        createElement('span', {}, 'Registered Assets Catalog')
+      ]),
+      createElement('span', { className: 'text-xs text-slate-400 font-mono' }, `${this.assets.count} Active Assets in Registry`)
+    ]);
+
+    const galleryGrid = createElement('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-6' });
+
+    const allAssets = this.assets.getAll();
+
+    Object.entries(allAssets).forEach(([key, asset]) => {
+      const isCached = this.assets.has(key);
+      const fullUrl = this.assets.getUrl(key);
+
+      const card = createElement('div', {
+        className: 'rounded-xl border overflow-hidden flex flex-col justify-between group transition-all hover:border-indigo-500/50 shadow-sm',
+        style: { backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }
+      });
+
+      // Image Container with fallback handling
+      const imgWrapper = createElement('div', {
+        className: 'relative w-full h-48 bg-slate-950 overflow-hidden flex items-center justify-center'
+      });
+
+      const img = createElement('img', {
+        src: fullUrl,
+        alt: asset.alt || key,
+        className: 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300',
+        loading: 'lazy'
+      });
+      img.referrerPolicy = 'no-referrer';
+
+      const tagBadge = createElement('div', {
+        className: 'absolute top-3 left-3 px-2 py-1 rounded bg-black/70 backdrop-blur-md text-[10px] font-mono text-indigo-300 border border-indigo-500/30'
+      }, key);
+
+      const cacheBadge = createElement('div', {
+        className: `absolute top-3 right-3 px-2 py-1 rounded backdrop-blur-md text-[10px] font-mono border ${
+          isCached
+            ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
+            : 'bg-slate-900/80 text-slate-400 border-slate-700/40'
+        }`
+      }, isCached ? '● Cached (Memory)' : '○ Standby');
+
+      imgWrapper.appendChild(img);
+      imgWrapper.appendChild(tagBadge);
+      imgWrapper.appendChild(cacheBadge);
+
+      // Metadata Info
+      const body = createElement('div', { className: 'p-4 space-y-3 flex-1 flex flex-col justify-between' }, [
+        createElement('div', { className: 'space-y-1.5' }, [
+          createElement('h4', { className: 'font-bold text-sm text-slate-100 group-hover:text-indigo-400 transition-colors' }, asset.title || key),
+          createElement('p', { className: 'text-xs text-slate-400 line-clamp-2' }, asset.alt || 'Visual system asset'),
+          createElement('div', { className: 'flex flex-wrap gap-1 pt-1' },
+            (asset.tags || []).map(t =>
+              createElement('span', {
+                className: 'px-1.5 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-300 border border-slate-700'
+              }, `#${t}`)
+            )
+          )
+        ]),
+        createElement('div', { className: 'space-y-2 pt-2 border-t', style: { borderColor: 'var(--border-color)' } }, [
+          createElement('div', { className: 'text-[11px] font-mono text-slate-400 truncate', title: fullUrl }, fullUrl),
+          createElement('div', { className: 'flex items-center justify-between gap-2' }, [
+            createElement('button', {
+              className: 'flex-1 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-all text-center',
+              onclick: async () => {
+                try {
+                  await this.assets.load(key);
+                  this.logger.info(`[AssetManager] Loaded "${key}" directly`);
+                  this.renderAssetLab();
+                } catch (e) {
+                  this.logger.error(`[AssetManager] Failed to load "${key}": ${e.message}`);
+                }
+              }
+            }, isCached ? '✓ Cached' : '⚡ Load'),
+            createElement('button', {
+              className: 'px-3 py-1.5 rounded border border-slate-700 hover:bg-slate-800 text-xs font-mono text-indigo-400 transition-all',
+              title: 'Copy Asset Key',
+              onclick: (e) => {
+                if (navigator.clipboard) {
+                  navigator.clipboard.writeText(key);
+                  e.target.textContent = 'Copied!';
+                  setTimeout(() => { e.target.textContent = 'Copy'; }, 1500);
+                }
+              }
+            }, 'Copy')
+          ])
+        ])
+      ]);
+
+      card.appendChild(imgWrapper);
+      card.appendChild(body);
+      galleryGrid.appendChild(card);
+    });
+
+    // Integration Code Card
+    const codeSnippet = `// 1. Initialize AssetManager in your Vexorion application
+import { AssetManager } from 'vexorion';
+
+const assets = new AssetManager({
+  assets: {
+    'logo': { url: '/src/assets/images/vexorion_logo.jpg', alt: 'Vexorion Logo', tags: ['branding'] },
+    'hero': { url: '/src/assets/images/hero_banner.jpg', alt: 'Hero Banner', tags: ['hero'] }
+  }
+});
+
+// 2. Preload assets asynchronously
+await assets.preloadAll();
+
+// 3. Create reactive Image DOM elements automatically
+const logoElement = assets.createImageElement('logo', {
+  className: 'w-10 h-10 rounded-lg shadow-md'
+});
+document.body.appendChild(logoElement);
+
+// 4. Retrieve cached resolved URL or inspect metadata
+const url = assets.getUrl('logo');
+const meta = assets.getMeta('logo');`;
+
+    const codeCard = createElement('div', {
+      className: 'p-5 rounded-xl border space-y-2',
+      style: { backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }
+    }, [
+      createElement('div', { className: 'flex items-center justify-between' }, [
+        createElement('span', { className: 'text-xs font-mono font-bold text-indigo-400' }, 'ASSETMANAGER INTEGRATION PATTERN'),
+        createElement('span', { className: 'text-xs text-slate-400' }, 'ES Module Syntax')
+      ]),
+      createElement('pre', {
+        className: 'p-4 rounded-lg bg-slate-950 text-indigo-300 font-mono text-xs overflow-x-auto border border-slate-800 leading-relaxed'
+      }, codeSnippet)
+    ]);
+
+    container.appendChild(header);
+    container.appendChild(statsBar);
+    container.appendChild(actionsCard);
+    container.appendChild(registerCard);
+    container.appendChild(galleryHeading);
+    container.appendChild(galleryGrid);
+    container.appendChild(codeCard);
+
     main.appendChild(container);
   }
 

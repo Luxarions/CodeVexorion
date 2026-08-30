@@ -204,8 +204,11 @@ function isEmpty(obj) {
   if (obj === null || obj === undefined) {
     return true;
   }
-  if (Array.isArray(obj)) {
+  if (typeof obj === 'string' || Array.isArray(obj)) {
     return obj.length === 0;
+  }
+  if (obj instanceof Map || obj instanceof Set) {
+    return obj.size === 0;
   }
   if (typeof obj === 'object') {
     return Object.keys(obj).length === 0;

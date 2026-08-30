@@ -20,6 +20,7 @@ export { Logger } from './classes/Logger.js';
 export { Validator } from './classes/Validator.js';
 export { Router } from './classes/Router.js';
 export { Store } from './classes/Store.js';
+export { AssetManager } from './classes/AssetManager.js';
 
 // ===== MODE MODULES =====
 export { Mode } from './modes/Mode.js';

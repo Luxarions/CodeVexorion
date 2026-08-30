@@ -56,9 +56,13 @@ class Validator extends EventEmitter {
       : Array.isArray(rules) ? rules : [rules];
 
     for (const rule of ruleArray) {
-      const [name, param] = rule.includes(':') 
-        ? rule.split(':') 
-        : [rule, null];
+      let name = rule;
+      let param = null;
+      const colonIndex = rule.indexOf(':');
+      if (colonIndex !== -1) {
+        name = rule.slice(0, colonIndex).trim();
+        param = rule.slice(colonIndex + 1).trim();
+      }
       
       const error = this.#applyRule(name, value, param);
       if (error) {

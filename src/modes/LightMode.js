@@ -29,9 +29,9 @@ class LightMode extends Mode {
     });
   }
 
-  // ===== PRIVATE METHODS =====
+  // ===== OVERRIDDEN METHODS =====
   
-  #applyPreference(key, value) {
+  applyPreference(key, value) {
     if (typeof document === 'undefined') return;
     switch (key) {
       case 'highContrast':

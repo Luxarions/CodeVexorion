@@ -64,7 +64,7 @@ class Store extends EventEmitter {
           // Async effect
           result
             .then(data => {
-              if (data) {
+              if (data !== undefined) {
                 this.dispatch({ type: `${processedAction.type}_SUCCESS`, payload: data });
               }
             })
@@ -74,9 +74,9 @@ class Store extends EventEmitter {
           this.#isDispatching = false;
           return this;
         }
-        if (result) {
-          this.dispatch({ type: `${processedAction.type}_SUCCESS`, payload: result });
+        if (result !== undefined) {
           this.#isDispatching = false;
+          this.dispatch({ type: `${processedAction.type}_SUCCESS`, payload: result });
           return this;
         }
       }

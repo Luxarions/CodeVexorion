@@ -192,9 +192,13 @@ class Router extends EventEmitter {
   #parseQueryString() {
     if (typeof window === 'undefined') return {};
     const query = {};
-    const search = window.location.search.slice(1);
+    let search = window.location.search ? window.location.search.slice(1) : '';
+    if (this.#mode === 'hash' && window.location.hash.includes('?')) {
+      search = window.location.hash.split('?')[1] || '';
+    }
     if (search) {
       for (const pair of search.split('&')) {
+        if (!pair) continue;
         const [key, value] = pair.split('=');
         if (key) {
           query[decodeURIComponent(key)] = decodeURIComponent(value || '');
@@ -206,16 +210,21 @@ class Router extends EventEmitter {
 
   #getCurrentPath() {
     if (typeof window === 'undefined') return '/';
+    let raw = '';
     if (this.#mode === 'history') {
       let path = window.location.pathname;
       if (this.#basePath && path.startsWith(this.#basePath)) {
         path = path.slice(this.#basePath.length);
       }
-      return path || '/';
+      raw = path || '/';
     } else {
       const hash = window.location.hash.slice(1);
-      return hash || '/';
+      raw = hash || '/';
     }
+
+    const queryIndex = raw.indexOf('?');
+    const pathOnly = queryIndex !== -1 ? raw.slice(0, queryIndex) : raw;
+    return pathOnly.startsWith('/') ? pathOnly : '/' + pathOnly;
   }
 
   #getFullPath(path) {

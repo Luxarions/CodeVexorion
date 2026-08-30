@@ -1,15 +1,13 @@
 class EventEmitter {
-  // ===== PUBLIC PROPERTIES =====
-  maxListeners = 10;
-  
   // ===== PRIVATE FIELDS =====
+  #maxListeners = 10;
   #listeners = new Map();
   #paused = false;
   #queue = [];
 
   // ===== CONSTRUCTOR =====
   constructor(options = {}) {
-    this.maxListeners = options.maxListeners || 10;
+    this.#maxListeners = options.maxListeners || 10;
     this.#paused = options.paused || false;
   }
 
@@ -167,6 +165,10 @@ class EventEmitter {
 
   // ===== GETTERS =====
   
+  get maxListeners() {
+    return this.#maxListeners;
+  }
+
   get isPaused() {
     return this.#paused;
   }
@@ -185,7 +187,7 @@ class EventEmitter {
     if (typeof value !== 'number' || value < 1) {
       throw new Error('maxListeners must be a positive number');
     }
-    this.maxListeners = value;
+    this.#maxListeners = value;
   }
 
   // ===== STATIC METHODS =====

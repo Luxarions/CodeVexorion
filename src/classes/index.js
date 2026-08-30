@@ -8,3 +8,4 @@ export { Logger } from './Logger.js';
 export { Validator } from './Validator.js';
 export { Router } from './Router.js';
 export { Store } from './Store.js';
+export { AssetManager } from './AssetManager.js';

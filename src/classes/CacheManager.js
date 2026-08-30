@@ -15,6 +15,8 @@ class CacheManager extends EventEmitter {
   #accessOrder = [];
   #frequency = new Map();
   #persistenceKey = null;
+  #hits = 0;
+  #misses = 0;
 
   // ===== CONSTRUCTOR =====
   constructor(options = {}) {
@@ -61,18 +63,23 @@ class CacheManager extends EventEmitter {
 
   get(key, defaultValue = null) {
     if (!this.#cache.has(key)) {
+      this.#misses++;
       return defaultValue;
     }
 
     const entry = this.#cache.get(key);
     
     if (entry.expires < Date.now()) {
+      this.#misses++;
       this.delete(key);
       return defaultValue;
     }
 
+    this.#hits++;
     entry.frequency++;
-    this.#updateAccess(key);
+    if (this.#strategy === 'lru') {
+      this.#updateAccess(key);
+    }
 
     return deepClone(entry.value);
   }
@@ -230,7 +237,8 @@ class CacheManager extends EventEmitter {
   }
 
   #calculateHitRate() {
-    return 0.95;
+    const total = this.#hits + this.#misses;
+    return total > 0 ? Number((this.#hits / total).toFixed(2)) : 1.0;
   }
 
   #saveToStorage() {

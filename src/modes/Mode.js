@@ -38,7 +38,7 @@ class Mode extends EventEmitter {
 
     this.#active = true;
     this.#applyTheme();
-    this.#applyPreferences();
+    this.applyPreferences();
     this.emit('activate', { mode: this.#name });
     this.#logger.info(`Mode activated: ${this.#name}`);
     
@@ -52,7 +52,7 @@ class Mode extends EventEmitter {
 
     this.#active = false;
     this.#resetTheme();
-    this.#resetPreferences();
+    this.resetPreferences();
     this.emit('deactivate', { mode: this.#name });
     this.#logger.info(`Mode deactivated: ${this.#name}`);
     
@@ -75,7 +75,7 @@ class Mode extends EventEmitter {
   setPreference(key, value) {
     this.#preferences[key] = value;
     if (this.#active) {
-      this.#applyPreference(key, value);
+      this.applyPreference(key, value);
     }
     this.#savePreferences();
     this.emit('preference-change', { key, value });
@@ -107,6 +107,22 @@ class Mode extends EventEmitter {
     return false;
   }
 
+  // ===== PROTECTED / OVERRIDABLE METHODS =====
+  
+  applyPreferences() {
+    for (const [key, value] of Object.entries(this.#preferences)) {
+      this.applyPreference(key, value);
+    }
+  }
+
+  applyPreference(key, value) {
+    // Override in child classes
+  }
+
+  resetPreferences() {
+    // Override in child classes
+  }
+
   // ===== PRIVATE METHODS =====
   
   #applyTheme() {
@@ -125,20 +141,6 @@ class Mode extends EventEmitter {
         root.style.removeProperty(key);
       }
     }
-  }
-
-  #applyPreferences() {
-    for (const [key, value] of Object.entries(this.#preferences)) {
-      this.#applyPreference(key, value);
-    }
-  }
-
-  #applyPreference(key, value) {
-    // Override in child classes
-  }
-
-  #resetPreferences() {
-    // Override in child classes
   }
 
   #loadPreferences() {

@@ -19,7 +19,8 @@ class StateManager extends EventEmitter {
     super(options);
     this.#state = deepClone(initialState);
     this.#maxHistory = options.maxHistory || 50;
-    this.#history.push(deepClone(initialState));
+    this.#history = [];
+    this.#future = [];
   }
 
   // ===== PUBLIC METHODS =====
@@ -107,14 +108,15 @@ class StateManager extends EventEmitter {
   }
 
   undo() {
-    if (this.#history.length <= 1) {
+    if (this.#history.length === 0) {
       this.emit('error', new Error('No more states to undo'));
       return this;
     }
 
-    this.#future.push(this.#history.pop());
+    const prevState = this.#history.pop();
+    this.#future.push(deepClone(this.#state));
     this.#isRestoring = true;
-    this.#state = deepClone(this.#history[this.#history.length - 1]);
+    this.#state = deepClone(prevState);
     this.#isRestoring = false;
 
     this.emit('undo', { state: this.#state });
@@ -127,10 +129,10 @@ class StateManager extends EventEmitter {
       return this;
     }
 
-    const state = this.#future.pop();
-    this.#history.push(state);
+    const nextState = this.#future.pop();
+    this.#history.push(deepClone(this.#state));
     this.#isRestoring = true;
-    this.#state = deepClone(state);
+    this.#state = deepClone(nextState);
     this.#isRestoring = false;
 
     this.emit('redo', { state: this.#state });
@@ -139,7 +141,7 @@ class StateManager extends EventEmitter {
 
   reset(initialState = {}) {
     this.#state = deepClone(initialState);
-    this.#history = [deepClone(initialState)];
+    this.#history = [];
     this.#future = [];
     this.emit('reset', { state: this.#state });
     return this;
@@ -162,7 +164,7 @@ class StateManager extends EventEmitter {
   }
 
   get canUndo() {
-    return this.#history.length > 1;
+    return this.#history.length > 0;
   }
 
   get canRedo() {
