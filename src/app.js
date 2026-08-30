@@ -1241,9 +1241,10 @@ class VexorionApp {
 
     const allAssets = this.assets.getAll();
 
-    Object.entries(allAssets).forEach(([key, asset]) => {
-      const isCached = this.assets.has(key);
-      const fullUrl = this.assets.getUrl(key);
+    allAssets.forEach(asset => {
+      const key = asset.name;
+      const isLoaded = this.assets.isLoaded(key);
+      const fullUrl = asset.url;
 
       const card = createElement('div', {
         className: 'rounded-xl border overflow-hidden flex flex-col justify-between group transition-all hover:border-indigo-500/50 shadow-sm',
@@ -1269,11 +1270,11 @@ class VexorionApp {
 
       const cacheBadge = createElement('div', {
         className: `absolute top-3 right-3 px-2 py-1 rounded backdrop-blur-md text-[10px] font-mono border ${
-          isCached
+          isLoaded
             ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
             : 'bg-slate-900/80 text-slate-400 border-slate-700/40'
         }`
-      }, isCached ? '● Cached (Memory)' : '○ Standby');
+      }, isLoaded ? '● Cached (Memory)' : '○ Standby');
 
       imgWrapper.appendChild(img);
       imgWrapper.appendChild(tagBadge);
@@ -1306,7 +1307,7 @@ class VexorionApp {
                   this.logger.error(`[AssetManager] Failed to load "${key}": ${e.message}`);
                 }
               }
-            }, isCached ? '✓ Cached' : '⚡ Load'),
+            }, isLoaded ? '✓ Cached' : '⚡ Load'),
             createElement('button', {
               className: 'px-3 py-1.5 rounded border border-slate-700 hover:bg-slate-800 text-xs font-mono text-indigo-400 transition-all',
               title: 'Copy Asset Key',

@@ -200,6 +200,18 @@ class AssetManager extends EventEmitter {
     return img;
   }
 
+  clearCache() {
+    this.#loaded.clear();
+    this.#loading.clear();
+    this.emit('clear-cache');
+    return this;
+  }
+
+  getMeta(name) {
+    const asset = this.#assets.get(name);
+    return asset ? { ...asset.metadata, title: asset.title, alt: asset.alt, type: asset.type } : null;
+  }
+
   getAll() {
     return Array.from(this.#assets.values());
   }
@@ -242,8 +254,20 @@ class AssetManager extends EventEmitter {
     return this.#assets.size;
   }
 
+  get count() {
+    return this.#assets.size;
+  }
+
   get loadedCount() {
     return this.#loaded.size;
+  }
+
+  get cache() {
+    return {
+      size: this.#loaded.size,
+      has: (name) => this.#loaded.has(name),
+      get: (name) => this.#loaded.get(name)
+    };
   }
 
   // ===== STATIC METHODS =====
