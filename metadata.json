@@ -1,0 +1,6 @@
+{
+  "name": "Vexorion - Complete JavaScript Framework",
+  "description": "Pure custom JavaScript framework featuring core detection, DOM utilities, state management, cache, routing, streaming, and theme modes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
