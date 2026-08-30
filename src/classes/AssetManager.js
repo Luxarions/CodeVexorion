@@ -83,6 +83,49 @@ class AssetManager extends EventEmitter {
     return this.#loaded.has(name);
   }
 
+  async loadAssets(names = [], onProgress = null) {
+    const targetNames = Array.isArray(names) && names.length > 0
+      ? names
+      : Array.from(this.#assets.keys());
+
+    let loadedCount = 0;
+    const total = targetNames.length;
+
+    const results = await Promise.allSettled(
+      targetNames.map(async (name) => {
+        try {
+          const res = await this.load(name);
+          loadedCount++;
+          if (typeof onProgress === 'function') {
+            onProgress({
+              loaded: loadedCount,
+              total,
+              percent: Math.round((loadedCount / total) * 100),
+              current: name,
+              asset: res
+            });
+          }
+          return res;
+        } catch (err) {
+          loadedCount++;
+          if (typeof onProgress === 'function') {
+            onProgress({
+              loaded: loadedCount,
+              total,
+              percent: Math.round((loadedCount / total) * 100),
+              current: name,
+              error: err
+            });
+          }
+          throw err;
+        }
+      })
+    );
+
+    this.emit('batch-loaded', { loadedCount, total, results });
+    return results;
+  }
+
   async load(name) {
     const asset = this.#assets.get(name);
     if (!asset) {
@@ -140,30 +183,7 @@ class AssetManager extends EventEmitter {
   }
 
   async preloadAll(onProgress = null) {
-    const names = Array.from(this.#assets.keys());
-    let loadedCount = 0;
-    const total = names.length;
-
-    const results = await Promise.allSettled(
-      names.map(async (name) => {
-        try {
-          const res = await this.load(name);
-          loadedCount++;
-          if (typeof onProgress === 'function') {
-            onProgress({ loaded: loadedCount, total, percent: Math.round((loadedCount / total) * 100), current: name });
-          }
-          return res;
-        } catch (err) {
-          loadedCount++;
-          if (typeof onProgress === 'function') {
-            onProgress({ loaded: loadedCount, total, percent: Math.round((loadedCount / total) * 100), current: name, error: err });
-          }
-          throw err;
-        }
-      })
-    );
-
-    return results;
+    return this.loadAssets([], onProgress);
   }
 
   createImageElement(name, options = {}) {
